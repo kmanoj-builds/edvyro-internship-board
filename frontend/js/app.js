@@ -1,5 +1,8 @@
 
-import { internships } from "./data.js";
+import { internships as fallbackInternships } from "./data.js";
+
+let internships = [...fallbackInternships];
+const API_BASE_URL = window.INTERNBOARD_API_URL || "http://localhost:5000/api";
 
 // ========================================
 // 1. DOM ELEMENTS
@@ -78,7 +81,7 @@ function updateStatistics() {
   ).size;
 
   const totalOpenings = internships.reduce(
-    (total, internship) => total + internship.openings,
+    (total, internship) =>     total + (Number(internship.openings) || 0),
     0
   );
 
@@ -344,7 +347,7 @@ function returnToDetails() {
 // 9. APPLICATION FORM SUBMISSION
 // ========================================
 
-function handleApplicationSubmit(event) {
+async function handleApplicationSubmit(event) {
   event.preventDefault();
 
   // Validate all required fields and input types
@@ -361,20 +364,34 @@ function handleApplicationSubmit(event) {
     portfolioUrl: portfolioUrl.value.trim(),
   };
 
-  // Demo only: no backend submission yet
-  console.log("Application validated:", {
-    internshipId: applicationData.internshipId,
-    name: applicationData.name,
-    email: applicationData.email,
-  });
-
-  applicationMessage.textContent =
-    "Your application details are valid! Backend submission will be added in the next phase.";
-
-  applicationMessage.classList.add("success-message");
-
-  submitApplicationButton.textContent = "Validated";
   submitApplicationButton.disabled = true;
+  applicationMessage.classList.remove("success-message");
+  applicationMessage.textContent = "Submitting your application...";
+
+  try {
+    const response = await fetch(
+      `${API_BASE_URL}/internships/${encodeURIComponent(applicationData.internshipId)}/applications`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: applicationData.name,
+          email: applicationData.email,
+        }),
+      }
+    );
+    const result = await response.json();
+    if (!response.ok) {
+      throw new Error(result.message || "Application submission failed.");
+    }
+    applicationMessage.textContent = result.message;
+    applicationMessage.classList.add("success-message");
+    submitApplicationButton.textContent = "Submitted";
+  } catch (error) {
+    applicationMessage.textContent =
+      `${error.message} Please check that the backend is running and try again.`;
+    submitApplicationButton.disabled = false;
+  }
 }
 
 // ========================================
@@ -446,24 +463,32 @@ filterForm.addEventListener("reset", () => {
 // 12. INITIALIZE APPLICATION
 // ========================================
 
-function initializeApp() {
+async function initializeApp() {
   try {
-    if (!Array.isArray(internships)) {
-      throw new Error("Invalid internship data");
+    const response = await fetch(`${API_BASE_URL}/internships`);
+    if (!response.ok) {
+      throw new Error(`Backend returned HTTP ${response.status}.`);
     }
-
+    const result = await response.json();
+    if (!Array.isArray(result.data)) {
+      throw new Error("Backend returned invalid internship data.");
+    }
+    internships = result.data.map((internship) => ({
+      ...internship,
+      location: internship.location || "Location not specified",
+      skills: Array.isArray(internship.skills) ? internship.skills : [],
+      openings: Number(internship.openings) || 0,
+    }));
     updateStatistics();
     populateDomainFilter();
     renderInternships(internships);
   } catch (error) {
-    console.error("Application initialization failed:", error);
-
-    internshipList.replaceChildren();
-
-    statusMessage.textContent =
-      "Something went wrong while loading internships.";
-
-    resultsCount.textContent = "Unable to load internships";
+    console.warn("Backend unavailable; using local internship data.", error);
+    internships = [...fallbackInternships];
+    updateStatistics();
+    populateDomainFilter();
+    renderInternships(internships);
+    statusMessage.textContent = "Backend unavailable. Showing local sample data.";
   }
 }
 

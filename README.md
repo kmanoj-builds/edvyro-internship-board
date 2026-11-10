@@ -76,6 +76,33 @@ The application form currently performs client-side validation.
 
 Backend integration and persistent application storage are not implemented in this frontend version.
 
+## Task 3 Backend API
+
+The Task 3 implementation is in [`backend/`](./backend/). It provides a tested Node.js + Express REST API with persistent SQLite storage, repeatable schema initialization, official EdVyro seed import, validation, pagination, and foreign-key-safe deletion.
+
+### Run the backend
+
+```bash
+cd backend
+npm install
+copy .env.example .env
+npm start
+```
+
+Run the isolated API tests with `npm test` from `backend/`. The API base URL is `http://localhost:5000/api`; endpoint details, request examples, schema mapping, and response formats are in [`backend/README.md`](./backend/README.md).
+
+### Task 3 endpoints
+
+- `GET /health`
+- `GET /internships?page=1&limit=10`
+- `GET /internships/:id`
+- `POST /internships`
+- `PUT /internships/:id` (full update)
+- `DELETE /internships/:id`
+- `POST /internships/:id/applications`
+
+The frontend now loads internships from the backend and submits applications through the API. If the backend is unavailable, it falls back to the existing Task 2 sample data.
+
 ## Responsive Design
 
 The interface is designed for:

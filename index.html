@@ -1,0 +1,443 @@
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <meta
+    name="description"
+    content="Explore internship opportunities across different technical domains."
+  />
+
+  <title>InternBoard | Find Your Next Internship</title>
+
+  <link rel="stylesheet" href="./frontend/css/styles.css" />
+  <script type="module" src="./frontend/js/app.js"></script>
+</head>
+
+<body>
+
+  <!-- Header -->
+  <header class="site-header">
+    <nav class="navbar container" aria-label="Main navigation">
+
+      <a href="#" class="brand" aria-label="InternBoard home">
+        Intern<span>Board.</span>
+      </a>
+
+      <a href="#internships" class="nav-link">
+        Explore Internships
+      </a>
+
+    </nav>
+  </header>
+
+
+  <main>
+
+    <!-- Hero Section -->
+    <section class="hero container">
+
+      <p class="eyebrow">YOUR CAREER STARTS HERE</p>
+
+      <h1>
+        Find an internship.
+        <span>Build your future.</span>
+      </h1>
+
+      <p class="hero-description">
+        Discover opportunities, develop real-world skills,
+        and take the next step in your career.
+      </p>
+
+      <div class="hero-stats" aria-label="Internship statistics">
+
+        <div class="stat-item">
+          <strong id="total-internships">0</strong>
+          <span>Opportunities</span>
+        </div>
+
+        <div class="stat-item">
+          <strong id="total-domains">0</strong>
+          <span>Domains</span>
+        </div>
+
+        <div class="stat-item">
+          <strong id="total-openings">0</strong>
+          <span>Openings</span>
+        </div>
+
+      </div>
+
+    </section>
+
+
+    <!-- Internship Listings -->
+    <section
+      id="internships"
+      class="internships-section container"
+    >
+
+      <div class="section-heading">
+
+        <div>
+          <p class="eyebrow">OPPORTUNITIES</p>
+          <h2>Explore internships</h2>
+          <p>Find the right opportunity for your skills.</p>
+        </div>
+
+        <span id="results-count" aria-live="polite">
+          0 internships found
+        </span>
+
+      </div>
+
+
+      <!-- Search and Filters -->
+      <form id="filter-form" class="filter-panel">
+
+        <div class="form-group search-group">
+
+          <label for="search-input">
+            Search internships
+          </label>
+
+          <input
+            type="search"
+            id="search-input"
+            name="search"
+            placeholder="Search by title, location or skill..."
+            autocomplete="off"
+          />
+
+        </div>
+
+
+        <div class="form-group">
+
+          <label for="domain-filter">Domain</label>
+
+          <select id="domain-filter" name="domain">
+            <option value="all">All domains</option>
+          </select>
+
+        </div>
+
+
+        <div class="form-group">
+
+          <label for="mode-filter">Work mode</label>
+
+          <select id="mode-filter" name="mode">
+            <option value="all">All modes</option>
+            <option value="Remote">Remote</option>
+            <option value="Hybrid">Hybrid</option>
+            <option value="On-site">On-site</option>
+          </select>
+
+        </div>
+
+
+        <button type="reset" id="reset-filters">
+          Clear filters
+        </button>
+
+      </form>
+
+
+      <!-- Status Message -->
+      <div
+        id="status-message"
+        class="status-message"
+        role="status"
+        aria-live="polite"
+      ></div>
+
+
+      <!-- Internship Cards -->
+      <div
+        id="internship-list"
+        class="internship-grid"
+        aria-label="Available internships"
+      ></div>
+
+
+      <!-- Internship Modal -->
+      <dialog
+        id="internship-modal"
+        class="internship-modal"
+        aria-labelledby="modal-title"
+      >
+
+        <!-- Internship Details View -->
+        <section id="internship-details-view">
+
+          <div class="modal-header">
+
+            <div>
+              <p class="eyebrow">INTERNSHIP DETAILS</p>
+              <h2 id="modal-title">Internship Title</h2>
+            </div>
+
+            <button
+              type="button"
+              id="close-modal"
+              class="close-modal"
+              aria-label="Close internship details"
+            >
+              &times;
+            </button>
+
+          </div>
+
+
+          <div class="modal-content">
+
+            <p id="modal-id" class="internship-id"></p>
+
+            <div class="modal-info">
+
+              <div>
+                <span>Domain</span>
+                <strong id="modal-domain"></strong>
+              </div>
+
+              <div>
+                <span>Location</span>
+                <strong id="modal-location"></strong>
+              </div>
+
+              <div>
+                <span>Work mode</span>
+                <strong id="modal-mode"></strong>
+              </div>
+
+              <div>
+                <span>Openings</span>
+                <strong id="modal-openings"></strong>
+              </div>
+
+            </div>
+
+
+            <div class="modal-skills-section">
+
+              <h3>Required skills</h3>
+
+              <div
+                id="modal-skills"
+                class="skills-container"
+              ></div>
+
+            </div>
+
+
+            <div class="modal-actions">
+
+              <button
+                type="button"
+                id="apply-button"
+                class="apply-button"
+              >
+                Apply Now
+              </button>
+
+            </div>
+
+          </div>
+
+        </section>
+
+
+        <!-- Application Form View -->
+        <section id="application-view" hidden>
+
+          <div class="modal-header">
+
+            <div>
+              <p class="eyebrow">APPLICATION FORM</p>
+              <h2>Apply for internship</h2>
+              <p id="application-internship-title" class="form-subtitle"></p>
+            </div>
+
+            <button
+              type="button"
+              id="close-application-modal"
+              class="close-modal"
+              aria-label="Close application form"
+            >
+              &times;
+            </button>
+
+          </div>
+
+
+          <form id="application-form" class="application-form" novalidate>
+
+            <input
+              type="hidden"
+              id="application-internship-id"
+              name="internshipId"
+            />
+
+
+            <div class="form-group">
+
+              <label for="applicant-name">
+                Full name <span>*</span>
+              </label>
+
+              <input
+                type="text"
+                id="applicant-name"
+                name="name"
+                placeholder="Enter your full name"
+                minlength="2"
+                maxlength="80"
+                autocomplete="name"
+                required
+              />
+
+              <small class="field-error" id="name-error"></small>
+
+            </div>
+
+
+            <div class="form-group">
+
+              <label for="applicant-email">
+                Email address <span>*</span>
+              </label>
+
+              <input
+                type="email"
+                id="applicant-email"
+                name="email"
+                placeholder="you@example.com"
+                autocomplete="email"
+                required
+              />
+
+              <small class="field-error" id="email-error"></small>
+
+            </div>
+
+
+            <div class="form-group">
+
+              <label for="applicant-phone">
+                Phone number <span>*</span>
+              </label>
+
+              <input
+                type="tel"
+                id="applicant-phone"
+                name="phone"
+                placeholder="Enter your phone number"
+                minlength="7"
+                maxlength="20"
+                autocomplete="tel"
+                required
+              />
+
+              <small class="field-error" id="phone-error"></small>
+
+            </div>
+
+
+            <div class="form-group">
+
+              <label for="resume-url">
+                Resume URL <span>*</span>
+              </label>
+
+              <input
+                type="url"
+                id="resume-url"
+                name="resumeUrl"
+                placeholder="https://example.com/resume.pdf"
+                required
+              />
+
+              <small class="field-error" id="resume-error"></small>
+
+            </div>
+
+
+            <div class="form-group">
+
+              <label for="portfolio-url">
+                Portfolio URL
+                <span class="optional-label">(Optional)</span>
+              </label>
+
+              <input
+                type="url"
+                id="portfolio-url"
+                name="portfolioUrl"
+                placeholder="https://yourportfolio.com"
+              />
+
+              <small class="field-error" id="portfolio-error"></small>
+
+            </div>
+
+
+            <p
+              id="application-message"
+              class="application-message"
+              role="status"
+              aria-live="polite"
+            ></p>
+
+
+            <div class="application-actions">
+
+              <button
+                type="button"
+                id="back-to-details"
+                class="secondary-button"
+              >
+                Back
+              </button>
+
+              <button
+                type="submit"
+                id="submit-application"
+                class="apply-button"
+              >
+                Submit Application
+              </button>
+
+            </div>
+
+          </form>
+
+        </section>
+
+      </dialog>
+
+    </section>
+
+  </main>
+
+
+  <!-- Footer -->
+  <footer class="site-footer">
+
+    <div class="container">
+
+      <p>
+        Built with HTML, CSS and JavaScript.
+        <span>© 2026 InternBoard</span>
+      </p>
+
+    </div>
+
+  </footer>
+
+</body>
+
+</html>
